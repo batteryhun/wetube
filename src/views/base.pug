@@ -1,7 +1,7 @@
 doctype html
 html(lang="en")
     head
-        title #{pageTitle} | Wetube
+        title #{pageTitle} | #{siteName}
         link(rel="stylesheet" href="https://unpkg.com/mvp.css") 
     body
         header
@@ -13,10 +13,16 @@ html(lang="en")
                     a(href="/videos/upload") Upload Video
                 li 
                     a(href="/search") Search Video
-                li 
-                    a(href="/join") Join     
-                li 
-                    a(href="/login") Login                  
+                if !loggedIn
+                    li 
+                        a(href="/join") Join     
+                    li 
+                        a(href="/login") Login                  
+                if loggedIn 
+                    li 
+                        a(href="/logout") Logout
+                    li 
+                        a(href="/profile") #{user.name}의 profile
         main
             block content 
     include partials/footer.pug
