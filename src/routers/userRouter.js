@@ -1,11 +1,20 @@
 import express from "express";
-import { edit, removeUser, logout, see } from "../controllers/userController";
+import {
+  edit,
+  removeUser,
+  logout,
+  see,
+  githubStart,
+  githubFinish,
+} from "../controllers/userController";
 
-const userRounter = express.Router();
+const userRouter = express.Router();
 
-userRounter.get("/:id(\\d+)", see);
-userRounter.get("/logout", logout);
-userRounter.get("/edit", edit);
-userRounter.get("/delete", removeUser);
+userRouter.get("/:id(\\d+)", see);
+userRouter.get("/github/start", githubStart);
+userRouter.get("/github/finish", githubFinish);
+userRouter.get("/logout", logout);
+userRouter.get("/edit", edit);
+userRouter.get("/delete", removeUser);
 
-export default userRounter;
+export default userRouter;
