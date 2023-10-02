@@ -35,7 +35,7 @@ export const getLogin = (req, res) => {
 };
 export const postLogin = async (req, res) => {
   const { username, password } = req.body;
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ username, socialOnly: false });
   const pageTitle = "Login";
   if (!user) {
     return res.status(400).render("login", {
@@ -76,7 +76,6 @@ export const githubFinish = async (req, res) => {
   };
   const params = new URLSearchParams(config).toString();
   const finalURL = `${baseURL}?${params}`;
-  console.log(finalURL);
   const tokenRequest = await (
     await fetch(finalURL, {
       method: "POST",
@@ -102,19 +101,35 @@ export const githubFinish = async (req, res) => {
         },
       })
     ).json();
-    const email = emailData.find(
+    const emailObj = emailData.find(
       (email) => email.primary === true && email.verified === true
     );
-    console.log(email);
-    if (!email) {
+    console.log(userData, emailObj);
+    if (!emailObj) {
       return res.redirect("/login");
     }
+    let user = await User.findOne({ email: emailObj.email });
+    if (!user) {
+      user = await User.create({
+        name: userData.name ? userData.name : "Unknown",
+        avartarUrl: userData.avatar_url,
+        username: userData.login,
+        email: emailObj.email,
+        password: "",
+        socialOnly: true,
+        location: userData.location,
+      });
+    }
+    req.session.loggedIn = true;
+    req.session.user = user;
+    return res.redirect("/");
   } else {
     return res.redirect("/login");
   }
 };
-export const edit = (req, res) => res.send("Edit User");
-export const removeUser = (req, res) => res.send("Delete User");
 
-export const logout = (req, res) => res.send("Log out");
-export const see = (req, res) => res.send("See User");
+export const logout = (req, res) => {
+  req.session.destroy();
+  return res.redirect("/");
+};
+export const see = (req, res) => res.send("see user");
