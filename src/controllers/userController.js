@@ -104,7 +104,6 @@ export const githubFinish = async (req, res) => {
     const emailObj = emailData.find(
       (email) => email.primary === true && email.verified === true
     );
-    console.log(userData, emailObj);
     if (!emailObj) {
       return res.redirect("/login");
     }
@@ -126,6 +125,52 @@ export const githubFinish = async (req, res) => {
   } else {
     return res.redirect("/login");
   }
+};
+
+export const kakaoStart = async (req, res) => {
+  const baseURL = "https://kauth.kakao.com/oauth/authorize";
+  const config = {
+    response_type: "code",
+    client_id: process.env.KO_API_KEY,
+    redirect_uri: process.env.KO_REDIRECT_URI,
+    scope: "openid,account_email",
+  };
+  const params = new URLSearchParams(config).toString();
+  const finalURL = `${baseURL}?${params}`;
+  return res.redirect(finalURL);
+};
+export const kakaoFinish = async (req, res) => {
+  const baseURL = "https://kauth.kakao.com/oauth/token";
+  const config = {
+    grant_type: "authorization_code",
+    client_id: process.env.KO_API_KEY,
+    redirect_uri: process.env.KO_REDIRECT_URI,
+    code: req.query.code,
+    client_secret: process.env.KO_CLIENT_SECRET_CODE,
+  };
+  const params = new URLSearchParams(config).toString();
+  const finalURL = `${baseURL}?${params}`;
+  const tokenRequest = await (
+    await fetch(finalURL, {
+      method: "POST",
+      headers: {
+        Content_type: "application/json",
+      },
+    })
+  ).json();
+  if ("access_token" in tokenRequest) {
+    const { access_token } = tokenRequest;
+    const apiURL = "https://kapi.kakao.com/v2/user/me";
+    const userData = await (
+      await fetch(apiURL, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          Content_type: "application/json",
+        },
+      })
+    ).json();
+  }
+  return res.redirect("/");
 };
 
 export const logout = (req, res) => {
