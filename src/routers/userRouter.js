@@ -11,12 +11,20 @@ import {
   getChangePassword,
   postChangePassword,
 } from "../controllers/userController";
-import { protectorMiddleware, publicOnlyMiddleware } from "../middleware";
+import {
+  protectorMiddleware,
+  publicOnlyMiddleware,
+  uploadFiles,
+} from "../middleware";
 
 const userRouter = express.Router();
 
 userRouter.get("/:id(\\d+)", see);
-userRouter.route("/edit").all(protectorMiddleware).get(getEdit).post(postEdit);
+userRouter
+  .route("/edit")
+  .all(protectorMiddleware)
+  .get(getEdit)
+  .post(uploadFiles.single("avatar"), postEdit);
 userRouter.get("/github/start", publicOnlyMiddleware, githubStart);
 userRouter.get("/github/finish", publicOnlyMiddleware, githubFinish);
 userRouter.get("/kakao/start", publicOnlyMiddleware, kakaoStart);
