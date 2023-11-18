@@ -12,9 +12,9 @@ import {
   postChangePassword,
 } from "../controllers/userController";
 import {
-  avatarUpload,
   protectorMiddleware,
   publicOnlyMiddleware,
+  uploadFiles,
 } from "../middleware";
 
 const userRouter = express.Router();
@@ -24,7 +24,7 @@ userRouter
   .route("/edit")
   .all(protectorMiddleware)
   .get(getEdit)
-  .post(avatarUpload.single("avatar"), postEdit);
+  .post(uploadFiles.single("avatar"), postEdit);
 userRouter.get("/github/start", publicOnlyMiddleware, githubStart);
 userRouter.get("/github/finish", publicOnlyMiddleware, githubFinish);
 userRouter.get("/kakao/start", publicOnlyMiddleware, kakaoStart);
