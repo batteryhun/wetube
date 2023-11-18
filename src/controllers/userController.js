@@ -185,20 +185,13 @@ export const getEdit = (req, res) => {
 export const postEdit = async (req, res) => {
   const {
     session: {
-      user: { _id, avatarUrl },
+      user: { _id },
     },
     body: { name, username, email, location },
-    file,
   } = req;
   const updatedUser = await User.findByIdAndUpdate(
     _id,
-    {
-      avatarUrl: file ? file.path : avatarUrl,
-      name,
-      username,
-      email,
-      location,
-    },
+    { name, username, email, location },
     { new: true }
   );
   req.session.user = updatedUser;
@@ -238,11 +231,4 @@ export const postChangePassword = async (req, res) => {
   return res.redirect("/users/logout");
 };
 
-export const see = async (req, res) => {
-  const { id } = req.params;
-  const user = await User.findById(id);
-  return res.render("users/profile", {
-    pageTitle: user.name,
-    user,
-  });
-};
+export const see = (req, res) => res.send("see user");
