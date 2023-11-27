@@ -19,7 +19,6 @@ import {
 
 const userRouter = express.Router();
 
-userRouter.get("/:id(\\d+)", see);
 userRouter
   .route("/edit")
   .all(protectorMiddleware)
@@ -36,4 +35,5 @@ userRouter
   .get(getChangePassword)
   .post(postChangePassword);
 
+userRouter.get("/:id", see);
 export default userRouter;
