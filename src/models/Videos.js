@@ -10,6 +10,7 @@ const videoSchema = new mongoose.Schema({
     views: { type: Number, default: 0 },
     rating: { type: Number, default: 0 },
   },
+  owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
 });
 
 // if you use middleware below like that!
