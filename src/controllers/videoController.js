@@ -11,26 +11,37 @@ export const home = async (req, res) => {
 };
 export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id);
-  const owner = await User.findById(video.owner);
+  const video = await Video.findById(id).populate("owner");
   if (!video) {
     return res.render("error", { pageTitle: "No video" });
   }
-  return res.render("watch", { pageTitle: video.title, video, owner });
+  return res.render("watch", { pageTitle: video.title, video });
 };
 export const getEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const video = await Video.findById(id);
   if (!video) {
     return res.status(404).render("error", { pageTitle: "No video" });
+  }
+  if (String(video.owner) !== _id) {
+    return res.status(403).redirect("/");
   }
   return res.render("edit", { pageTitle: `Editing ${video.title}`, video });
 };
 export const postEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const video = await Video.findById(id);
   if (!video) {
     return res.status(404).render("error", { pageTitle: "No video" });
+  }
+  if (String(video.owner) !== _id) {
+    return res.status(403).redirect("/");
   }
   const { title, description, hashtag } = req.body;
   await Video.findByIdAndUpdate(id, {
@@ -54,13 +65,16 @@ export const postUpload = async (req, res) => {
     },
   } = req;
   try {
-    await Video.create({
+    const newVideo = await Video.create({
       title,
       description,
       fileUrl,
       owner: _id,
       hashtag: Video.hashtagFormat(hashtag),
     });
+    const user = await User.findById(_id);
+    user.videos.push(newVideo._id);
+    user.save();
     return res.redirect("/");
   } catch (error) {
     return res.render("upload", {
@@ -72,6 +86,16 @@ export const postUpload = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
+  const video = await Video.findById(id);
+  if (!video) {
+    return res.status(404).render("error", { pageTitle: "No video" });
+  }
+  if (String(video.owner) !== _id) {
+    return res.status(403).redirect("/");
+  }
   await Video.findByIdAndDelete(id);
   return res.redirect("/");
 };
