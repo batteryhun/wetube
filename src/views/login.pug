@@ -7,11 +7,7 @@ block content
         input(name="username", type="text", required, placeholder="username")
         input(name="password", type="password", required, placeholder="password")
         input(type="submit", value="Login")
-        br
-        a(href="/users/github/start") Start with github &rarr;
-        br
-        a(href="/users/kakao/start") Start with kakao &rarr;
-    hr
+        include partials/social-login
     div
         span Create an account? 
-        a(href="/join") Join &rarr;
+        a(href="/join") Create one now! &rarr;

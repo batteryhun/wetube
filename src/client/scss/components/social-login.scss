@@ -1,0 +1,12 @@
+.social-login {
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  padding-top: 50px;
+  margin-top: 20px;
+  .social__btn--github {
+    background-color: #24883b;
+  }
+  .social__btn--kakao {
+    background-color: #fee102;
+    color: black;
+  }
+}
